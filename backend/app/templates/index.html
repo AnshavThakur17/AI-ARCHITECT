@@ -958,6 +958,7 @@
       }
       .roadmap-container {
         grid-template-columns: 1fr;
+      }
     }
 
     /* NEXT LEVEL EFFECTS AND ANIMATIONS */
@@ -1057,6 +1058,26 @@
     @keyframes rotate-ring {
       from { transform: rotate(0deg); }
       to { transform: rotate(360deg); }
+    }
+
+    /* Responsive adjustments for standard laptop screens (e.g. 14" high-DPI scaling) */
+    @media (max-width: 1440px) or (max-height: 850px) {
+      :root {
+        font-size: 14px;
+      }
+      .sidebar {
+        width: 320px;
+      }
+      .details-panel {
+        height: 280px;
+        padding: 1rem;
+      }
+      header {
+        padding: 0.75rem 1.5rem;
+      }
+      .chat-message {
+        padding: 0.65rem 0.85rem;
+      }
     }
   </style>
 </head>
@@ -2537,7 +2558,7 @@
       if (nodesData.length > 0) {
         const totalHeight = nodesData[nodesData.length - 1].y + 60;
         if (totalHeight > svgHeight) {
-          zoomLevel = Math.max(0.55, svgHeight / (totalHeight + 40));
+          zoomLevel = Math.max(0.2, svgHeight / (totalHeight + 40));
         }
         panY = 10;
       } else {
