@@ -1029,17 +1029,7 @@
       animation: ripple-anim 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
     }
 
-    .node-group {
-      cursor: grab;
-      transition: filter 0.2s;
-      transform-box: fill-box;
-      transform-origin: center;
-      animation: node-scale-up 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-    }
-    @keyframes node-scale-up {
-      from { transform: scale(0.2); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
-    }
+    /* Removed CSS transform animation to prevent overriding JavaScript translate coordinates */
 
     .node-hover-ring {
       fill: none;
@@ -2550,19 +2540,25 @@
     }
 
     function resetZoomPan() {
+      const svgWidth = graphSvg.clientWidth || 800;
       const svgHeight = graphSvg.clientHeight || 450;
       zoomLevel = 1.0;
-      panX = 0;
       
-      // Vertically center the layout
+      // Centering calculations
       if (nodesData.length > 0) {
         const totalHeight = nodesData[nodesData.length - 1].y + 60;
         if (totalHeight > svgHeight) {
           zoomLevel = Math.max(0.2, svgHeight / (totalHeight + 40));
         }
         panY = 10;
+        
+        // Dynamically center horizontally based on current client width
+        const originalCenterX = nodesData[0].x;
+        const currentCenterX = svgWidth / 2;
+        panX = currentCenterX - originalCenterX * zoomLevel;
       } else {
         panY = 0;
+        panX = 0;
       }
       applyTransform();
     }
