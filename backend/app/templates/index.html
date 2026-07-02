@@ -1923,12 +1923,12 @@
 
       // Mock full data package for spec sheet loading
       const dataPackage = {
-        llm_understanding: { scale: calculateScaleFromCost(record.estimated_cost) },
+        llm_understanding: { scale: record.scale },
         system_decisions: {
           needs_queue: record.architecture.includes('Queue') || record.architecture.includes('WebSocket'),
           needs_cache: record.architecture.includes('Cache') || record.architecture.includes('Redis'),
           needs_cdn: record.architecture.includes('CDN'),
-          needs_sharding: parseInt(record.estimated_cost) > 500
+          needs_sharding: record.scale > 1000000
         },
         database_choice: {
           database: record.database_choice,
@@ -1939,7 +1939,8 @@
           reason: record.architecture.includes('Redis') ? 'Low latency caching requested.' : 'Caching not prioritized.'
         },
         predicted_failures: predictFailuresLocally(record),
-        architecture: archList
+        architecture: archList,
+        estimated_cost: record.estimated_cost
       };
 
       // Reset Q&A context greeting
@@ -2070,6 +2071,12 @@
       }
     });
 
+    function estimateServers(scale) {
+      if (scale <= 100000) return 1;
+      if (scale <= 1000000) return 2;
+      return Math.max(2, Math.floor(scale / 500000));
+    }
+
     // Update Detail Spec panels
     function updateSpecSheet(data) {
       // Decisions
@@ -2089,9 +2096,14 @@
       scrambleText(document.getElementById('spec-cache-reason'), data.cache_layer.reason);
 
       // Cost & Instances
-      const scaleVal = data.llm_understanding.scale || 10000;
-      const servers = Math.max(1, Math.floor(scaleVal / 10000000));
-      const costMonthly = servers * 250;
+      let costMonthly, servers;
+      if (data.cost_estimate) {
+        costMonthly = data.cost_estimate.monthly_cost_usd;
+        servers = data.cost_estimate.servers_needed;
+      } else {
+        costMonthly = parseInt(data.estimated_cost) || 250;
+        servers = estimateServers(data.llm_understanding.scale || 10000);
+      }
       scrambleText(document.getElementById('spec-cost-val'), `$${costMonthly}`);
       scrambleText(document.getElementById('spec-servers-needed'), `${servers} VM instance${servers > 1 ? 's' : ''}`);
 

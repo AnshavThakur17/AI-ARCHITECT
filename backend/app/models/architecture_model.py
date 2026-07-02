@@ -42,6 +42,12 @@ class ArchitectureAnalysis(Base):
         nullable=False
     )
 
+    scale = Column(
+        Integer,
+        nullable=False,
+        default=10000
+    )
+
     created_at = Column(
         DateTime,
         default=datetime.utcnow

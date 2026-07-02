@@ -17,10 +17,24 @@ def extract_requirements(prompt: str):
     }
 
     
-    match = re.search(r'(\d+)\s*million', prompt)
+    # Clean prompt to replace commas in numbers (e.g. 50,000 -> 50000)
+    cleaned_prompt = re.sub(r'(\d+),(\d+)', r'\1\2', prompt)
+
+    # match numbers, supporting words like million, m, k, thousand, users
+    match = re.search(r'(\d+)\s*(million|m|k|thousand|users|voters)?', cleaned_prompt)
 
     if match:
-        result["users"] = int(match.group(1)) * 1000000
+        val = int(match.group(1))
+        unit = match.group(2)
+        if unit:
+            if "million" in unit or unit == "m":
+                result["users"] = val * 1000000
+            elif "thousand" in unit or unit == "k":
+                result["users"] = val * 1000
+            else:
+                result["users"] = val
+        else:
+            result["users"] = val
 
     
     if "chat" in prompt:

@@ -46,10 +46,14 @@ def analyze(
 
     # Sanitize scale value to be an integer
     try:
-        requirements["scale"] = int(requirements["scale"])
+        if isinstance(requirements.get("scale"), str):
+            requirements["scale"] = int(requirements["scale"].replace(",", "").strip())
+        else:
+            requirements["scale"] = int(requirements["scale"])
     except (ValueError, TypeError):
         if isinstance(requirements.get("scale"), str):
-            match = re.search(r'(\d+)', requirements["scale"])
+            val_str = requirements["scale"].replace(",", "")
+            match = re.search(r'(\d+)', val_str)
             if match:
                 val = int(match.group(1))
                 if "million" in requirements["scale"].lower():
@@ -99,7 +103,13 @@ def analyze(
     try:
         extra_info = extract_requirements(data.prompt)
         app_type = extra_info.get("app_type", "unknown")
-        cost_info = estimate_cost(requirements["scale"])
+        cost_info = estimate_cost(
+            scale=requirements["scale"],
+            database=database.get("database"),
+            cache=cache.get("cache"),
+            needs_queue=decisions.get("needs_queue", False),
+            needs_cdn=decisions.get("needs_cdn", False)
+        )
         cost = cost_info.get("monthly_cost_usd", 250)
 
         save_analysis(
@@ -108,11 +118,17 @@ def analyze(
             app_type=app_type,
             architecture=architecture,
             database=database["database"],
-            cost=cost
+            cost=cost,
+            scale=requirements["scale"]
         )
     except Exception as db_err:
         # Log error or print, but don't fail the request if database save fails
         print(f"Error saving analysis to database: {db_err}")
+        # Make sure cost_info has a fallback structure
+        cost_info = {
+            "servers_needed": 1,
+            "monthly_cost_usd": 250
+        }
 
     return {
 
@@ -130,5 +146,7 @@ def analyze(
 
         "cache_layer": cache,
 
-        "predicted_failures": failures
+        "predicted_failures": failures,
+
+        "cost_estimate": cost_info
     }

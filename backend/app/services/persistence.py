@@ -11,7 +11,8 @@ def save_analysis(
         app_type,
         architecture,
         database,
-        cost):
+        cost,
+        scale):
 
     new_record = ArchitectureAnalysis(
 
@@ -23,7 +24,9 @@ def save_analysis(
 
         database_choice=str(database),
 
-        estimated_cost=str(cost)
+        estimated_cost=str(cost),
+
+        scale=scale
     )
 
     db.add(new_record)
