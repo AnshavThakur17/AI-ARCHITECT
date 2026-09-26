@@ -1,7 +1,17 @@
-HEY EVERYONE,ANSHAV THIS SIDE.
-TO RUN THIS PROJECT IN YOUR SYSTEM YOU SIMPLY NEED TO RUN THESE COMMMANDS
+HEY EVERYONE, ANSHAV THIS SIDE.
 
- AI Architect Setup
+🔗 LIVE DEMO: https://ai-architect-d2vd.onrender.com/
+
+PROJECT STRUCTURE
+This project has BOTH frontend and backend in this single repo — nothing is split into a separate repository.
+
+- The backend is built with FastAPI (Python).
+- The frontend (HTML/CSS/JS) is located at: backend/app/templates/index.html
+- The backend serves the frontend directly, so there is no separate "frontend" folder — it's all part of the same backend/app structure.
+
+TO RUN THIS PROJECT IN YOUR SYSTEM YOU SIMPLY NEED TO RUN THESE COMMANDS
+
+AI Architect Setup
 
 Clone the repository:
 
@@ -28,3 +38,7 @@ Run backend:
 
 uvicorn app.main:app --reload
 
+Once the server is running, open your browser and go to:
+http://127.0.0.1:8000
+
+This will load the frontend (index.html) directly — since the backend serves it, you don't need to run anything separately for the frontend.
